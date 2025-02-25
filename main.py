@@ -5,7 +5,7 @@ from util import *
 # Page title of the application
 page_title = "Summify"
 page_icon = "✨"
-st.set_page_config(page_title=page_title, page_icon=page_icon, layout="centered")
+st.set_page_config(page_title=page_title, page_icon=page_icon, layout="wide")
 
 # Session state variables
 if "scope" not in st.session_state:
@@ -20,20 +20,29 @@ if "image_content" not in st.session_state:
 st.title(f'{page_title}{page_icon}')
 st.write('***:blue[AI-Powered Summaries – Read Less, Know More!" 🤖📚]***')
 st.write("""
-*Summify is an AI-powered web app that generates concise and insightful summaries for any topic you enter. 📖✨ 
+*Summify is an AI-powered web app that generates concise and insightful summaries for your document. 📖✨ 
 It lets you download your summary in PDF 📝 or JPEG 🖼️ format, making it easy to save and share. Simplify research, 
 boost productivity, and stay informed effortlessly! 🚀💡*
 """)
 
-st.subheader('Enter Topic:🗂️', divider='gray')
-topic = st.text_input('Enter Topic Title', max_chars=200, label_visibility='collapsed')
-generate  = st.button("Generate", type='primary', disabled=not topic, icon=":material/summarize:")
+st.subheader('Upload PDF:📄️', divider='gray')
+uploaded_file = st.file_uploader("Choose a file", type=['pdf'], label_visibility='collapsed')
+generate  = st.button("Generate", type='primary', disabled=not uploaded_file, icon=":material/summarize:")
+
 if generate or st.session_state.scope:
     st.session_state.scope = True
     if generate:
         with st.spinner('Generating ...', show_time=True):
-            st.session_state.response = generate_summary(topic)
+            # Extract text from pdf file
+            extracted_text = extract_text_from_pdf(uploaded_file)
+
+            # Generate summary of the document
+            st.session_state.response = generate_summary(extracted_text)
+
+            # Create PDF of generated summary
             st.session_state.pdf_content = create_pdf_from_text(st.session_state.response)
+
+            # Create image of generated summary
             st.session_state.image_content = pdf_to_image(st.session_state.pdf_content)
 
     if st.session_state.response is not None:

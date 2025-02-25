@@ -1,25 +1,35 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Dict
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
 import streamlit as st
 from weasyprint import HTML
 from pdf2image import convert_from_bytes
-import math
+from html_tempate import *
 from io import BytesIO
+import pdfplumber
 
 groq_api_key = st.secrets['GROQ_API_KEY']
 PROMPT_TEMPLATE_SUMMARY = """
-You are expert in generating summary of the topic received from the user. Given the topic
-mentioned below, generate the summary 
-Give Topic: {topic} 
+You are expert in generating summary of the document received from the user. Given the document
+given below, generate the summary.
+
+The summary should be formatted as a list of dictionaries, where:
+
+Each dictionary represents a category.
+The key is the category name (e.g., "Introduction", "Key Concepts").
+The value is a list of bullet points under that category.
+Do NOT include unnecessary text, only return JSON output
+
+Given document: {document} 
                             """
 
 # Structure the response schema using Pydantic
 class Summary(BaseModel):
-    """Create summary of the given topic"""
-    title: str = Field(description="Title of the Topic.")
-    bullet_points: List[str] = Field(description="Summary of the topic in bullet points")
+    """Create summary of the provided document"""
+    title: str = Field(description="Title of the document.")
+    bullet_points: Dict[str, List[str]] = Field(description="Summary of the document with categorized bullet points as a list of dictionary, where keys are "
+                                                      "categories and values are single of multiple bullet points")
 
 # LLM Initialization
 def initialize_llm():
@@ -27,13 +37,13 @@ def initialize_llm():
     return llm
 
 # Generate structured output of the summary of given topic
-def generate_summary(topic):
+def generate_summary(extracted_text):
     # Initialize the LLM
     llm = initialize_llm()
 
     # Create prompt
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE_SUMMARY)
-    prompt = prompt_template.format(topic=topic)
+    prompt = prompt_template.format(document=extracted_text)
 
     # Get structured output from LLM
     structured_llm = llm.with_structured_output(Summary)
@@ -41,52 +51,33 @@ def generate_summary(topic):
 
     return structured_response.dict()
 
-# Display the summary in markdown format
+# Function to extract text from PDF file
+def extract_text_from_pdf(pdf_file_path):
+    # Open the PDF file using pdfplumber
+    with pdfplumber.open(pdf_file_path) as pdf:
+        # Initialize an empty string to store extracted text
+        extracted_text = ""
+
+        # Loop through all the pages and extract text
+        for page in pdf.pages:
+            extracted_text += page.extract_text()
+
+    return extracted_text
+
+# Display the summary in mark down format
 def display_summary(response):
     st.write(f"## {response['title']}")
-    for points in response["bullet_points"]:
-        st.write(f"* {points}")
+    for category, points in response["bullet_points"].items():
+        st.subheader(f"{category}:")
+        for point in points:
+            st.write(f"* {point}")
 
 # This function first converts the text into HTML format and then to PDF before downloading it
 def create_pdf_from_text(response):
-    title = f"<h1>{response['title']}</h1>\n"
-    bp = "\n".join(f"<li>{points}</li>" for points in response["bullet_points"])
-    content = '<ul>\n' + bp + '</ul>\n'
+    html_content = generate_html_template(response)
 
-    # Estimate the font size needed to fill the page
-    char_count = len(response['title']) + len(response['bullet_points'])
-    estimated_font_size = math.sqrt(620000 / char_count)  # 620000 is an approximation of characters that fit on an A4 page
-    font_size = min(max(estimated_font_size, 8), 36)  # Limit font size between 8 and 36
-
-    # Define the HTML template
-    html = f"""
-        <html>
-        <head>
-            <style>
-                @page {{ size: A4; margin: 1cm; }}
-                body {{ 
-                    font-family: Arial, sans-serif; 
-                    font-size: {font_size}px;
-                }}
-                h1 {{ 
-                    text-align: center; 
-                    color: #333; 
-                    font-size: {font_size * 1.5}px;
-                }}
-                p {{ 
-                    color: #666; 
-                    line-height: {font_size * 1.2}px;
-                }}
-            </style>
-        </head>
-        <body>
-            {title}
-            {content}
-        </body>
-        </html>
-        """
     # Convert HTML contents to PDF bytes
-    pdf_bytes = HTML(string=html).write_pdf()
+    pdf_bytes = HTML(string=html_content).write_pdf()
 
     return pdf_bytes
 
