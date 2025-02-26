@@ -1,0 +1,7 @@
+streamlit
+streamlit-pdf-viewer
+pdfplumber
+pdf2image
+weasyprint
+langchain-groq
+langchain
