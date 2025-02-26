@@ -8,11 +8,17 @@ from pdf2image import convert_from_bytes
 from html_tempate import *
 from io import BytesIO
 import pdfplumber
+from firecrawl import FirecrawlApp
+import re
 
+# Get API Keys from secrets
 groq_api_key = st.secrets['GROQ_API_KEY']
+firecrawl_api_key = st.secrets['FIRECRAWL_API_KEY']
+
+# Define prompt
 PROMPT_TEMPLATE_SUMMARY = """
 You are expert in generating summary of the document received from the user. Given the document
-given below, generate the summary.
+given below, generate the one page summary.
 
 The summary should be formatted as a list of dictionaries, where:
 
@@ -30,6 +36,10 @@ class Summary(BaseModel):
     title: str = Field(description="Title of the document.")
     bullet_points: Dict[str, List[str]] = Field(description="Summary of the document with categorized bullet points as a list of dictionary, where keys are "
                                                       "categories and values are single of multiple bullet points")
+
+def load_css(file_path):
+    with open(file_path) as f:
+        st.html(f"<style>{f.read()}</style>")
 
 # LLM Initialization
 def initialize_llm():
@@ -50,6 +60,23 @@ def generate_summary(extracted_text):
     structured_response = structured_llm.invoke(prompt)
 
     return structured_response.dict()
+
+def extract_text(input_contents, input_method):
+    if input_method == 'Upload PDF':
+        return extract_text_from_pdf(input_contents)
+    elif input_method == 'Web URL':
+        extracted_text = extract_text_from_url(input_contents)
+        return extracted_text
+
+def extract_text_from_url(input_contents):
+    app = FirecrawlApp(api_key=firecrawl_api_key)
+    response = app.scrape_url(url=input_contents, params={'formats': ['markdown'], "onlyMainContent": True})
+    extracted_text = response['markdown']
+
+    # Remove URLs from extracted text using Regular expression
+    url_pattern = r'https?://\S+'
+    text_without_url = re.sub(url_pattern, '', extracted_text)
+    return text_without_url
 
 # Function to extract text from PDF file
 def extract_text_from_pdf(pdf_file_path):
@@ -73,8 +100,17 @@ def display_summary(response):
             st.write(f"* {point}")
 
 # This function first converts the text into HTML format and then to PDF before downloading it
-def create_pdf_from_text(response):
-    html_content = generate_html_template(response)
+def create_pdf_from_text(response, design):
+    if design == 1:
+        html_content = generate_html_template_1(response)
+    elif design == 2:
+        html_content = generate_html_template_2(response)
+    elif design == 3:
+        html_content = generate_html_template_3(response)
+    elif design == 4:
+        html_content = generate_html_template_4(response)
+    elif design == 5:
+        html_content = generate_html_template_5(response)
 
     # Convert HTML contents to PDF bytes
     pdf_bytes = HTML(string=html_content).write_pdf()
@@ -84,12 +120,13 @@ def create_pdf_from_text(response):
 
 def pdf_to_image(pdf_content):
     images = convert_from_bytes(pdf_content)
-    image = images[0]
+    # image = images[0]
+    img_bytes = []
 
-    # Convert PIL Image to Bytes
-    img_bytes_io = BytesIO()
-    image.save(img_bytes_io, format="JPEG")  # Use PNG if needed
-    img_bytes = img_bytes_io.getvalue()  # Get byte data
+    for image in images:
+        # Convert PIL Image to Bytes
+        img_bytes_io = BytesIO()
+        image.save(img_bytes_io, format="JPEG")  # Use PNG if needed
+        img_bytes.append(img_bytes_io.getvalue())  # Get byte data
 
     return img_bytes
-
