@@ -3,3 +3,4 @@ libxslt-dev
 libffi-dev
 libcairo2-dev
 libpango1.0-dev
+poppler-utils
