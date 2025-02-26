@@ -61,12 +61,14 @@ def generate_summary(extracted_text):
 
     return structured_response.dict()
 
+# Extract text from input source. After extracting text, it returns only 7000 characters to limit LLM token usage
 def extract_text(input_contents, input_method):
     if input_method == 'Upload PDF':
-        return extract_text_from_pdf(input_contents)
+        text = extract_text_from_pdf(input_contents)
+        return text[:7000]
     elif input_method == 'Web URL':
-        extracted_text = extract_text_from_url(input_contents)
-        return extracted_text
+        text = extract_text_from_url(input_contents)
+        return text[:7000]
 
 def extract_text_from_url(input_contents):
     app = FirecrawlApp(api_key=firecrawl_api_key)
