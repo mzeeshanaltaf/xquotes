@@ -6,6 +6,7 @@ It lets you download your summary in PDF 📝 or JPEG 🖼️ format, making it 
 boost productivity, and stay informed effortlessly! 🚀💡
 
 # Application Link
+https://summify-st.streamlit.app/
 
 # Technologies Used
 * streamlit -- Front end development
