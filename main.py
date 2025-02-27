@@ -66,7 +66,7 @@ with col1:
     selection_1 = st.checkbox("Design 1", key="design_1", on_change=update_design, args=("design_1",))
     if selection_1:
         st.session_state.design_selection = 1
-    st.image('design_1.jpg', width=200)
+    st.image('designs/design_1.jpg', width=200)
     # if st.button('Select', key='button_1', icon=":material/select:"):
     #     st.session_state.design_selection = 1
 
@@ -74,7 +74,7 @@ with col2:
     selection_2 = st.checkbox("Design 2", key="design_2", on_change=update_design, args=("design_2",))
     if selection_2:
         st.session_state.design_selection = 2
-    st.image('design_2.jpg', width=200)
+    st.image('designs/design_2.jpg', width=200)
     # if st.button('Select', key='button_2', icon=":material/select:"):
     #     st.session_state.design_selection = 2
 
@@ -82,20 +82,20 @@ with col3:
     selection_3 = st.checkbox("Design 3", key="design_3", on_change=update_design, args=("design_3",))
     if selection_3:
         st.session_state.design_selection = 3
-    st.image('design_3.jpg', width=200)
+    st.image('designs/design_3.jpg', width=200)
     # if st.button('Select', key='button_3', icon=":material/select:"):
     #     st.session_state.design_selection = 3
 with col4:
     selection_4 = st.checkbox("Design 4", key="design_4", on_change=update_design, args=("design_4",))
     if selection_4:
         st.session_state.design_selection = 4
-    st.image('design_4.jpg', width=200)
+    st.image('designs/design_4.jpg', width=200)
 
 with col5:
     selection_5 = st.checkbox("Design 5", key="design_5", on_change=update_design, args=("design_5",))
     if selection_5:
         st.session_state.design_selection = 5
-    st.image('design_5.jpg', width=200)
+    st.image('designs/design_5.jpg', width=200)
 
 if input_method == 'Upload PDF':
     st.subheader('Upload PDF:📄️', divider='gray')
