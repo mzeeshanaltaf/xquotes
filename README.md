@@ -9,7 +9,7 @@ boost productivity, and stay informed effortlessly! 🚀💡
 https://summify-st.streamlit.app/
 
 # Technologies Used
-* streamlit -- Front end development
+* Streamlit -- Front end development
 * LangChain -- LLM Orchestration
 * Groq -- Chat models
 * WeasyPrint -- HTML to PDF Conversion

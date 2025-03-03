@@ -17,7 +17,7 @@ firecrawl_api_key = st.secrets['FIRECRAWL_API_KEY']
 
 # Define prompt
 PROMPT_TEMPLATE_SUMMARY = """
-You are expert in generating summary of the document received from the user. Given the document
+You are expert in generating short and concise summary of the document received from the user. Given the document
 given below, generate the one page summary.
 
 The summary should be formatted as a list of dictionaries, where:
@@ -26,6 +26,7 @@ Each dictionary represents a category.
 The key is the category name (e.g., "Introduction", "Key Concepts").
 The value is a list of bullet points under that category.
 Do NOT include unnecessary text, only return JSON output
+Keep the summary short and concise, no more than one page
 
 Given document: {document} 
                             """

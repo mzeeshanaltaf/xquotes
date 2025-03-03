@@ -1,5 +1,4 @@
 import pathlib
-
 import streamlit as st
 from streamlit_pdf_viewer import pdf_viewer
 from util import *
@@ -34,7 +33,6 @@ if "design_5" not in st.session_state:
 css_path = pathlib.Path("assets/styles.css")
 load_css(css_path)
 
-# Function to handle checkbox behavior
 # Function to handle checkbox behavior
 def update_design(selected):
     for key in ["design_1", "design_2", "design_3", "design_4", "design_5"]:
@@ -128,8 +126,9 @@ if generate or st.session_state.scope:
 
     if st.session_state.response is not None:
         st.subheader('Summary:📄', divider='gray')
-        with st.container(border=True):
-            display_summary(st.session_state.response)
+        with st.expander("See Summary:", icon=":material/summarize:"):
+            with st.container(border=True):
+                display_summary(st.session_state.response)
 
         st.subheader('Preview:🔍', divider='gray')
         col1, col2 = st.columns(2, gap="small", vertical_alignment="top", border=True)
