@@ -43,9 +43,10 @@ def update_design(selected):
 st.title(f'{page_title}{page_icon}')
 st.write('***:blue[AI-Powered Summaries – Read Less, Know More!" 🤖📚]***')
 st.write("""
-*Summify is an AI-powered web app that generates concise and insightful summaries for your document. 📖✨ 
-It lets you download your summary in PDF 📝 or JPEG 🖼️ format, making it easy to save and share. Simplify research, 
-boost productivity, and stay informed effortlessly! 🚀💡*
+*Summify is an AI-powered web app that generates concise and insightful summaries from various sources. 📖✨ Upload a 
+document, provide a web URL, enter a YouTube video URL, or specify a topic, and Summify will create a clear and 
+structured summary for you. Download your summary in PDF 📝 or JPEG 🖼️ format, making it easy to save and share. 
+Simplify research, boost productivity, and stay informed effortlessly! 🚀💡*
 """)
 
 # Variable to store input provided by the user. In case of PDF upload, it will have path to pdf file and for Web URL, it
