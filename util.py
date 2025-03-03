@@ -9,6 +9,8 @@ from html_tempate import *
 from io import BytesIO
 import pdfplumber
 from firecrawl import FirecrawlApp
+from youtube_transcript_api import YouTubeTranscriptApi
+import urllib.parse as urlparse
 import re
 
 # Get API Keys from secrets
@@ -29,6 +31,21 @@ Do NOT include unnecessary text, only return JSON output
 Keep the summary short and concise, no more than one page
 
 Given document: {document} 
+                            """
+
+PROMPT_TEMPLATE_TOPIC_SUMMARY = """
+You are expert in generating short and concise summary of the topic received from the user. Given the topic
+given below, generate the one page summary.
+
+The summary should be formatted as a list of dictionaries, where:
+
+Each dictionary represents a category.
+The key is the category name (e.g., "Introduction", "Key Concepts").
+The value is a list of bullet points under that category.
+Do NOT include unnecessary text, only return JSON output
+Keep the summary short and concise, no more than one page
+
+Given topic: {topic} 
                             """
 
 # Structure the response schema using Pydantic
@@ -70,6 +87,12 @@ def extract_text(input_contents, input_method):
     elif input_method == 'Web URL':
         text = extract_text_from_url(input_contents)
         return text[:7000]
+    elif input_method == 'YouTube URL':
+        video_id = get_video_id(input_contents)
+        transcript_text = get_transcript_text(video_id)
+        return transcript_text
+    elif input_method == 'Topic':
+        return input_contents
 
 def extract_text_from_url(input_contents):
     app = FirecrawlApp(api_key=firecrawl_api_key)
@@ -133,3 +156,25 @@ def pdf_to_image(pdf_content):
         img_bytes.append(img_bytes_io.getvalue())  # Get byte data
 
     return img_bytes
+
+def get_video_id(youtube_url):
+    """Extract video ID from a YouTube URL"""
+    if "youtu.be" in youtube_url:
+        return youtube_url.split("/")[-1].split("?")[0]
+    elif "youtube.com/watch" in youtube_url:
+        query = urlparse.parse_qs(urlparse.urlparse(youtube_url).query)
+        return query["v"][0]
+    else:
+        # Assume the input is already a video ID
+        return youtube_url
+
+def get_transcript_text(video_id, languages=['en']):
+    """Get transcript text only (without timestamps) for a YouTube video"""
+    try:
+        transcript_data = YouTubeTranscriptApi.get_transcript(video_id, languages=languages)
+        # Extract only the text parts and join them
+        transcript_text = ' '.join([entry['text'] for entry in transcript_data])
+        return transcript_text
+    except Exception as e:
+        st.exception(f"An error occurred: {e}")
+        return None

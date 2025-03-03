@@ -54,7 +54,7 @@ input_contents = None
 
 # Configuration Options
 st.subheader('Select Input Method:', divider='gray')
-input_method = st.radio('Select Input Method', ['Upload PDF', 'Web URL'], label_visibility='collapsed', horizontal=True)
+input_method = st.radio('Select Input Method', ['Upload PDF', 'Web URL', 'YouTube URL', 'Topic'], label_visibility='collapsed', horizontal=True)
 
 # Configuration Options
 st.subheader('Select Design:', divider='gray')
@@ -65,24 +65,19 @@ with col1:
     if selection_1:
         st.session_state.design_selection = 1
     st.image('designs/design_1.jpg', width=200)
-    # if st.button('Select', key='button_1', icon=":material/select:"):
-    #     st.session_state.design_selection = 1
 
 with col2:
     selection_2 = st.checkbox("Design 2", key="design_2", on_change=update_design, args=("design_2",))
     if selection_2:
         st.session_state.design_selection = 2
     st.image('designs/design_2.jpg', width=200)
-    # if st.button('Select', key='button_2', icon=":material/select:"):
-    #     st.session_state.design_selection = 2
 
 with col3:
     selection_3 = st.checkbox("Design 3", key="design_3", on_change=update_design, args=("design_3",))
     if selection_3:
         st.session_state.design_selection = 3
     st.image('designs/design_3.jpg', width=200)
-    # if st.button('Select', key='button_3', icon=":material/select:"):
-    #     st.session_state.design_selection = 3
+
 with col4:
     selection_4 = st.checkbox("Design 4", key="design_4", on_change=update_design, args=("design_4",))
     if selection_4:
@@ -102,8 +97,18 @@ if input_method == 'Upload PDF':
 
 elif input_method == 'Web URL':
     st.subheader('Enter Web URL:🌐️️', divider='gray')
-    web_url = st.text_input('Enter Web URL', label_visibility='collapsed', placeholder='Enter a Web URL')
+    web_url = st.text_input('Enter Web URL', label_visibility='collapsed', placeholder='Example: www.example.com')
     input_contents = web_url
+
+elif input_method == 'YouTube URL':
+    st.subheader('Enter YouTube URL:▶️️️', divider='gray')
+    web_url = st.text_input('Enter YouTube URL', label_visibility='collapsed', placeholder='Example: https://www.youtube.com/watch?v=g84CGmelvSU')
+    input_contents = web_url
+
+elif input_method == 'Topic':
+    st.subheader('Enter Topic:💬️️', divider='gray')
+    topic = st.text_input('Enter the Topic', label_visibility='collapsed', placeholder='Example: Generative AI')
+    input_contents = topic
 
 generate  = st.button("Generate", type='primary', icon=":material/summarize:", disabled=not input_contents)
 

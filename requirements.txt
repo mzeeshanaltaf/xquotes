@@ -6,3 +6,4 @@ weasyprint
 langchain-groq
 langchain
 firecrawl-py
+youtube-transcript-api
