@@ -92,7 +92,7 @@ with col5:
     st.image('designs/design_5.jpg', width=200)
 
 if input_method == 'Upload PDF':
-    st.subheader('Upload PDF:📄️', divider='gray')
+    st.subheader('Upload PDF:⬆️', divider='gray')
     uploaded_file = st.file_uploader("Choose a file", type=['pdf'], label_visibility='collapsed')
     input_contents = uploaded_file
 
@@ -143,13 +143,11 @@ if generate or st.session_state.scope:
             st.write('***PDF Preview***')
             pdf_viewer(st.session_state.pdf_content)
             st.download_button(label="Download PDF", data=st.session_state.pdf_content, file_name="summary.pdf",
-                               mime="application/pdf",
-                               icon=":material/picture_as_pdf:")
+                               mime="application/pdf", on_click="rerun", icon=":material/picture_as_pdf:")
         with col2:
             st.write('***Image️ Preview***')
             for image in st.session_state.image_content:
                 st.image(image)
             st.download_button(label="Download Image", data=st.session_state.image_content[0], file_name="summary.png",
-                               mime="image/png",
-                               icon=":material/image:")
+                               mime="image/png", on_click="rerun", icon=":material/image:")
 
